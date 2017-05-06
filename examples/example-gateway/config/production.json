@@ -30,7 +30,10 @@
 
 	"clients.googleNowTChannel.connectionType": "p2p",
 	"clients.googleNowTChannel.hostList": [
-		"127.0.0.1:4002"
+		"127.0.0.1:4003"
 	],
-	"clients.googleNowTChannel.timeout": 5000
+	"clients.googleNowTChannel.timeout": 5000,
+
+	"clients.nestedStructs.port": 4004,
+	"clients.nestedStructs.ip": "127.0.0.1"
 }

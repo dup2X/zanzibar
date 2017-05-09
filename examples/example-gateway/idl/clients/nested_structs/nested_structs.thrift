@@ -13,28 +13,39 @@ typedef string UUID
 
 struct RequiredExtra {
 	1: required list<string> one
-	2: required list<OptionalStruct> two
+	2: required list<OptionalTerminal> two
 	3: required set<string> three
-	4: required set<OptionalStruct> four
+	4: required set<OptionalTerminal> four
 	5: required map<string, string> five
-	6: required map<string, OptionalStruct> six
+	6: required map<string, OptionalTerminal> six
 	7: required UUID seven
 	8: required ItemType eight
 	9: required ItemState nine
-	10: required OptionalExtra ten
+	#10: required OptionalExtra ten
 }
 
 struct OptionalExtra {
 	1: optional list<string> one
-	2: optional list<OptionalStruct> two
+	2: optional list<OptionalTerminal> two
 	3: optional set<string> three
-	4: optional set<OptionalStruct> four
+	4: optional set<OptionalTerminal> four
 	5: optional map<string, string> five
-	6: optional map<string, OptionalStruct> six
+	6: optional map<string, OptionalTerminal> six
 	7: optional UUID seven
 	8: optional ItemType eight
 	9: optional ItemState nine
-	10: optional RequiredExtra ten
+	#10: optional RequiredExtra ten
+}
+
+struct OptionalTerminal {
+	1: optional bool one
+	2: optional byte two
+	3: optional i16 three
+	4: optional i32 four
+	5: optional i64 five
+	6: optional double six
+	7: optional binary seven
+	8: optional string eight
 }
 
 struct RequiredStruct {

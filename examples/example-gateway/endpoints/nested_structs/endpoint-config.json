@@ -1,0 +1,15 @@
+{
+	"name": "nestedStructs",
+	"type": "http",
+	"config": {
+		"rateLimit": 100,
+		"endpoints": [
+			"./first.json"
+		]
+	},
+	"dependencies": {
+		"client": [
+			"nestedStructs"
+		]
+	}
+}

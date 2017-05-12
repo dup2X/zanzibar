@@ -1,0 +1,15 @@
+{
+	"endpointType": "http",
+	"endpointId": "nestedStructs",
+	"handleId": "first",
+	"thriftFile": "endpoints/nested_structs/nested_structs.thrift",
+	"thriftFileSha": "{{placeholder}}",
+	"thriftMethodName": "NestedStructs::first",
+	"workflowType": "httpClient",
+	"clientName": "NestedStructs",
+	"clientMethod": "first",
+	"middlewares": [],
+	"testFixtures": [],
+	"reqHeaderMap": {},
+	"resHeaderMap": {}
+}

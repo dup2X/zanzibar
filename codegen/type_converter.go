@@ -55,6 +55,23 @@ func (c *TypeConverter) appendf(format string, parts ...interface{}) {
 	c.Lines = append(c.Lines, line)
 }
 
+func (c *TypeConverter) assignWithOverride(
+	toIdentifier string,
+	typeName string,
+	fromIdentifier string,
+	overiddenIdentifier string,
+) {
+	if overiddenIdentifier == "" {
+		c.append(toIdentifier, " = ", typeName, "(", fromIdentifier, ")")
+		return
+	}
+
+	c.append(toIdentifier, " = ", typeName, "(", overiddenIdentifier, ")")
+	c.append("if ", fromIdentifier, " != nil {")
+	c.append(toIdentifier, " = ", typeName, "(", fromIdentifier, ")")
+	c.append("}")
+}
+
 func (c *TypeConverter) getGoTypeName(
 	valueType compile.TypeSpec,
 ) (string, error) {
@@ -137,11 +154,14 @@ func (c *TypeConverter) genConverterForStruct(
 	c.append(indent, "	", toIdentifier, " = &", typeName, "{}")
 
 	subFromFields := fromFieldStruct.Fields
+	// Build subfield mapping
+
 	err = c.genStructConverter(
 		keyPrefix+".",
 		indent+"	",
 		subFromFields,
 		subToFields,
+		nil,
 	)
 	if err != nil {
 		return err
@@ -166,13 +186,20 @@ func (c *TypeConverter) genConverterForPrimitive(
 	if err != nil {
 		return err
 	}
-	if overiddenIdentifier != "" {
-
-	}
 	if toField.Required {
-		c.append(toIdentifier, " = ", typeName, "(", fromIdentifier, ")")
+		c.assignWithOverride(
+			toIdentifier,
+			typeName,
+			fromIdentifier,
+			overiddenIdentifier,
+		)
 	} else {
-		c.append(toIdentifier, " = (*", typeName, ")(", fromIdentifier, ")")
+		c.append(
+			toIdentifier,
+			fmt.Sprintf("(*%s)", typeName),
+			fromIdentifier,
+			overiddenIdentifier,
+		)
 	}
 	return nil
 }
@@ -320,7 +347,7 @@ func (c *TypeConverter) genStructConverter(
 
 		// Check for mapped field
 		var overiddenField *compile.FieldSpec
-		for k, v := range fieldMap {
+		for _, v := range fieldMap {
 			if v.dest.Name == toField.Name {
 				if fromField == nil {
 					fromField = v.dest
@@ -469,21 +496,6 @@ func (c *TypeConverter) GenStructConverter(
 type FieldMapperEntry struct {
 	dest          *compile.FieldSpec
 	override      bool
-	typeConverter string // TODO: implement
-	transform     string // TODO: implement
-}
-
-func assignWithOverride(
-	toIdentifier string,
-	typeName string,
-	fromIdentifier string,
-	overridenIdentifier string,
-) []string {
-
-	line1 := toIdentifier + " = " + typeName + "(" + overridenIdentifier + ")"
-	line2 := "if " + fromIdentifier + " != nil {"
-	line3 := toIdentifier + " = " + typeName + "(" + fromIdentifier + ")"
-	line4 := "}"
-
-	return []string{line1, line2, line3, line4}
+	typeConverter string // TODO: implement. i.e string(int) etc
+	transform     string // TODO: implement. i.e. camelCasing, Title, etc
 }

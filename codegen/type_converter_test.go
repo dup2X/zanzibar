@@ -966,8 +966,31 @@ func TestConvertWithBadKeyMapOfString(t *testing.T) {
 		err.Error(),
 	)
 }
+
 func TestConverterMap(t *testing.T) {
+	lines, err := convertTypes(
+		"Foo", "Bar",
+		`struct Foo {
+			1: optional bool one
+			2: required bool two
+		}
+
+		struct Bar {
+			1: optional bool one
+			2: required bool two
+		}`,
+		nil,
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, trim(`
+		out.One = (*bool)(in.One)
+		out.Two = bool(in.Two)
+	`), lines)
 }
 
 func TestConverterMapOverride(t *testing.T) {
+}
+
+func TestConverterMapWithSubFields(t *testing.T) {
 }

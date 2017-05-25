@@ -1,0 +1,16 @@
+{
+	"name": "baz",
+	"type": "tchannel",
+	"config": {
+		"thriftFile": "clients/baz/baz.thrift",
+		"thriftFileSha": "{{placeholder}}",
+		"clientName": "Baz",
+		"serviceName": "Qux",
+		"exposedMethods": {
+			"Call": "SimpleService::Call",
+			"Compare": "SimpleService::Compare",
+			"Ping": "SimpleService::Ping",
+			"DeliberateDiffNoop": "SimpleService::SillyNoop"
+		}
+	}
+}

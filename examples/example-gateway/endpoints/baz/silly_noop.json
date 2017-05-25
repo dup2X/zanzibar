@@ -1,0 +1,15 @@
+{
+	"endpointType": "http",
+	"endpointId": "baz",
+	"handleId": "sillyNoop",
+	"thriftFile": "endpoints/baz/baz.thrift",
+	"thriftFileSha": "{{placeholder}}",
+	"thriftMethodName": "SimpleService::SillyNoop",
+	"workflowType": "tchannelClient",
+	"clientName": "Baz",
+	"clientMethod": "DeliberateDiffNoop",
+	"testFixtures": [],
+	"middlewares": [],
+	"reqHeaderMap": {},
+	"resHeaderMap": {}
+}

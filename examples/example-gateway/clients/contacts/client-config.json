@@ -1,0 +1,10 @@
+{
+	"name": "contacts",
+	"type": "http",
+	"config": {
+		"thriftFile": "clients/contacts/contacts.thrift",
+		"thriftFileSha": "{{placeholder}}",
+		"clientName": "Contacts",
+		"serviceName": "Contacts"
+	}
+}

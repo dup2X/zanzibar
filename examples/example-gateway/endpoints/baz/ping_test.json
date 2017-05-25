@@ -1,0 +1,23 @@
+[{
+	"testName": "successfulRequest",
+	"testServiceName": "example-gateway",
+	"endpointId": "baz",
+	"handlerId": "ping",
+	"endpointRequest": {},
+	"endpointReqHeaders": {},
+	"endpointResponse": {
+		"message": "pong"
+	},
+	"endpointResHeaders": {},
+
+	"clientStubs": [{
+		"clientId": "baz",
+		"clientMethod": "ping",
+		"clientRequest": {},
+		"clientReqHeaders": {},
+		"clientResponse": {
+			"message": "pong"
+		},
+		"clientResHeaders": {}
+	}]
+}]

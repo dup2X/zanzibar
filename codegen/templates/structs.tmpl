@@ -1,0 +1,18 @@
+{{- /* template to render edge gateway http client code */ -}}
+
+package {{.PackageName}}
+
+import (
+	"runtime"
+	"path/filepath"
+
+	"github.com/uber/zanzibar/runtime"
+	{{range $idx, $pkg := .IncludedPackages -}}
+	{{$pkg.AliasName}} "{{$pkg.PackageName}}"
+	{{end}}
+)
+
+func getDirName() string {
+	_, file, _, _ := runtime.Caller(0)
+	return zanzibar.GetDirnameFromRuntimeCaller(file)
+}

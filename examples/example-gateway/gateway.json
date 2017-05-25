@@ -1,0 +1,13 @@
+{
+	"gatewayName": "example-gateway",
+	"packageRoot": "github.com/uber/zanzibar/examples/example-gateway",
+	"thriftRootDir": "./idl",
+	"gatewayNamespace": "github.com/uber/zanzibar",
+	"genCodePackage": "github.com/uber/zanzibar/examples/example-gateway/build/gen-code",
+	"targetGenDir": "./build",
+
+	"clientConfig": "./clients",
+	"endpointConfig": "./endpoints",
+	"middlewareConfig": "./middlewares/middleware-config.json",
+	"copyrightHeader": "./copyright_header.txt"
+}

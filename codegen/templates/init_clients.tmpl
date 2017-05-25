@@ -1,0 +1,29 @@
+{{- /* template to render gateway client initialization */ -}}
+
+package clients
+
+import (
+	{{range $idx, $pkg := .IncludedPackages -}}
+	{{$pkg.AliasName}} "{{$pkg.PackageName}}"
+	{{end}}
+	"github.com/uber/zanzibar/runtime"
+)
+
+// Clients datastructure that holds all the generated clients
+// This should only hold clients generate from specs
+type Clients struct {
+	{{range $idx, $clientInfo := .ClientInfo -}}
+	{{$clientInfo.FieldName}} {{if $clientInfo.IsPointerType}}*{{end}}{{$clientInfo.PackageName}}.{{$clientInfo.TypeName}}
+	{{end}}
+}
+
+// CreateClients will make all clients
+func CreateClients(
+	gateway *zanzibar.Gateway,
+) interface{} {
+	return &Clients{
+		{{range $idx, $cinfo := .ClientInfo -}}
+		{{$cinfo.FieldName}}: {{$cinfo.PackageName}}.NewClient(gateway),
+		{{end}}
+	}
+}

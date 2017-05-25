@@ -1,0 +1,10 @@
+{
+	"name": "googlenow",
+	"type": "http",
+	"config": {
+		"thriftFile": "clients/googlenow/googlenow.thrift",
+		"thriftFileSha": "{{placeholder}}",
+		"clientName": "GoogleNow",
+		"serviceName": "GoogleNow"
+	}
+}

@@ -1,8 +1,0 @@
-{
-	"name": "example-gateway",
-	"type": "gateway",
-	"config": {},
-	"deps": {
-		"endpoint": ["bar", "baz", "contacts", "googlenow"]
-	}
-}

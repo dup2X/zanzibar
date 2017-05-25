@@ -480,6 +480,7 @@ func TestConvertEnum(t *testing.T) {
 	`), lines)
 }
 
+<<<<<<< HEAD
 func TestConvertWithBadImportTypedef(t *testing.T) {
 	lines, err := convertTypes(
 		"Foo", "Bar",
@@ -965,4 +966,9 @@ func TestConvertWithBadKeyMapOfString(t *testing.T) {
 		"could not convert key (one), map is not string-keyed.",
 		err.Error(),
 	)
+}
+func TestConverterMap(t *testing.T) {
+}
+
+func TestConverterMapOverride(t *testing.T) {
 }

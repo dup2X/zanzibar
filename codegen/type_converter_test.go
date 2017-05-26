@@ -998,6 +998,7 @@ func TestConvertWithBadKeyMapOfString(t *testing.T) {
 }
 
 func TestConverterMap(t *testing.T) {
+
 	lines, err := convertTypes(
 		"Foo", "Bar",
 		`struct Foo {

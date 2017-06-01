@@ -1467,8 +1467,8 @@ func TestConvertWithMisMatchListTypesForOverride(t *testing.T) {
 
 func TestConvertWithMisMatchMapTypesForOverride(t *testing.T) {
 	fieldMap := make(map[string]codegen.FieldMapperEntry)
-	fieldMap["One"] = codegen.FieldMapperEntry{
-		QualifiedName: "Two",
+	fieldMap["Two"] = codegen.FieldMapperEntry{
+		QualifiedName: "One",
 		Override:      true,
 	}
 
@@ -1502,8 +1502,8 @@ func TestConvertWithMisMatchMapTypesForOverride(t *testing.T) {
 
 func TestConverterMapMapTypeIncompatabile(t *testing.T) {
 	fieldMap := make(map[string]codegen.FieldMapperEntry)
-	fieldMap["One"] = codegen.FieldMapperEntry{
-		QualifiedName: "Two",
+	fieldMap["Two"] = codegen.FieldMapperEntry{
+		QualifiedName: "One",
 		Override:      true,
 	}
 

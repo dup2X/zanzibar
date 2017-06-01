@@ -127,6 +127,16 @@ func (handler *{{$handlerName}}) HandleRequest(
 	}
 	{{end}}
 
+	{{range $headerName, $headerInfo := .ReqHeaderFields}}
+	{{camel $headerName}}Value, _ := req.Header.Get("{{$headerName}}")
+	{{if $headerInfo.IsPointer}}
+	{{$fieldId := $headerInfo.FieldIdentifier}}
+	requestBody{{$fieldId}} = ptr.String({{camel $headerName}}Value)
+	{{else}}
+	requestBody{{$headerInfo.FieldIdentifier}} = {{camel $headerName}}Value
+	{{end}}
+	{{end}}
+
 	workflow := {{$workflow}}{
 		Clients: handler.Clients,
 		Logger: req.Logger,
@@ -160,8 +170,12 @@ func (handler *{{$handlerName}}) HandleRequest(
 		}
 	}
 
-	{{- if .ReqHeaders }}
+	{{- if .ResHeaders }}
 	// TODO(sindelar): implement check headers on response
+	{{- end }}
+
+	{{- if .ResHeaderFields }}
+	// TODO(jakev): implement writing fields into response headers
 	{{- end }}
 
 	{{if eq .ResponseType "" -}}
@@ -358,7 +372,7 @@ func endpointTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "endpoint.tmpl", size: 8048, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
+	info := bindataFileInfo{name: "endpoint.tmpl", size: 8520, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -572,7 +586,7 @@ package {{.PackageName}}
 import (
 	"bytes"
 	"context"
-	{{if ne .Method.DownstreamMethod.ResponseType "" -}}
+	{{if .Method.DownstreamMethod.ResponseType -}}
 	"encoding/json"
 	{{end -}}
 	"path/filepath"
@@ -625,10 +639,10 @@ func Test{{title .HandlerID}}{{title .TestName}}OKResponse(t *testing.T) {
 	{{$clientFunc}} := func(
 		ctx context.Context,
 		reqHeaders map[string]string,
-		{{if ne $clientMethod.RequestType "" -}}
+		{{if $clientMethod.RequestType -}}
 		args {{$clientMethodRequestType}},
 		{{end -}}
-	) ({{- if ne $clientMethod.ResponseType "" -}}{{$clientMethodResponseType}}, {{- end -}}map[string]string, error) {
+	) ({{- if $clientMethod.ResponseType -}}{{$clientMethodResponseType}}, {{- end -}}map[string]string, error) {
 		{{$counter}}++
 
 		{{range $k, $v := .ClientReqHeaders -}}
@@ -639,14 +653,14 @@ func Test{{title .HandlerID}}{{title .TestName}}OKResponse(t *testing.T) {
 		{{end -}}
 
 		var resHeaders map[string]string
-		{{if ne (len .ClientResHeaders) 0 -}}
+		{{if (len .ClientResHeaders) -}}
 		resHeaders = map[string]string{}
 		{{end -}}
 		{{range $k, $v := .ClientResHeaders -}}
 		resHeaders["{{$k}}"] = "{{$v}}"
 		{{end}}
 
-		{{if ne $clientMethod.ResponseType "" -}}
+		{{if $clientMethod.ResponseType -}}
 		var res {{unref $clientMethod.ResponseType}}
 		err := json.Unmarshal([]byte(` + "`" + `{{.ClientResponseString}}` + "`" + `), &res)
 		if err!= nil {
@@ -683,7 +697,7 @@ func Test{{title .HandlerID}}{{title .TestName}}OKResponse(t *testing.T) {
 		return
 	}
 
-	{{if ne $responseType "" -}}
+	{{if $responseType -}}
 	defer func() { _ = res.Body.Close() }()
 	data, err := ioutil.ReadAll(res.Body)
 	if !assert.NoError(t, err, "failed to read response body") {
@@ -699,7 +713,7 @@ func Test{{title .HandlerID}}{{title .TestName}}OKResponse(t *testing.T) {
 		"{{$v}}",
 		res.Header.Get("{{$k}}"))
 	{{end -}}
-	{{if ne $responseType "" -}}
+	{{if $responseType -}}
 		assert.Equal(t, ` + "`" + `{{.EndpointResponseString}}` + "`" + `, string(data))
 	{{end -}}
 }
@@ -718,7 +732,7 @@ func endpoint_test_tchannel_clientTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "endpoint_test_tchannel_client.tmpl", size: 3892, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
+	info := bindataFileInfo{name: "endpoint_test_tchannel_client.tmpl", size: 3851, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -795,11 +809,19 @@ func (c *{{$clientName}}) {{title .Name}}(
 		c.ClientID, "{{.Name}}", c.HTTPClient,
 	)
 
+	{{- if .ReqHeaders }}
+	// TODO(jakev): Ensure we validate mandatory headers
+	{{- end}}
+
+	{{- if .ReqHeaderFields }}
+	// TODO(jakev): populate request headers from thrift body
+	{{- end}}
+
 	// Generate full URL.
 	fullURL := c.HTTPClient.BaseURL
 	{{- range $k, $segment := .PathSegments -}}
 	{{- if eq $segment.Type "static" -}}+"/{{$segment.Text}}"
-	{{- else -}}+"/"+string(r.{{$segment.BodyIdentifier | title}})
+	{{- else -}}+"/"+string(r{{$segment.BodyIdentifier | title}})
 	{{- end -}}
 	{{- end}}
 
@@ -820,6 +842,10 @@ func (c *{{$clientName}}) {{title .Name}}(
 	for k := range res.Header {
 		respHeaders[k] = res.Header.Get(k)
 	}
+
+	{{- if .ResHeaders }}
+	// TODO(jakev): verify mandatory response headers
+	{{- end}}
 
 	res.CheckOKResponse([]int{
 		{{- range $index, $code := .ValidStatusCodes -}}
@@ -845,6 +871,10 @@ func (c *{{$clientName}}) {{title .Name}}(
 			if err != nil {
 				return nil, respHeaders, err
 			}
+
+			{{- if .ResHeaderFields }}
+			// TODO(jakev): read response headers and put them in body
+			{{- end}}
 
 			return &responseBody, respHeaders, nil
 	}
@@ -883,6 +913,10 @@ func (c *{{$clientName}}) {{title .Name}}(
 				return nil, respHeaders, err
 			}
 
+			{{- if .ResHeaderFields }}
+			// TODO(jakev): read response headers and put them in body
+			{{- end}}
+
 			return &responseBody, respHeaders, nil
 		{{range $idx, $exception := .Exceptions}}
 		case {{$exception.StatusCode.Code}}:
@@ -920,7 +954,7 @@ func http_clientTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "http_client.tmpl", size: 4940, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
+	info := bindataFileInfo{name: "http_client.tmpl", size: 5425, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1337,8 +1371,12 @@ import (
 	{{end}}
 )
 
+{{$exposedMethods := .ExposedMethods -}}
 {{range $svc := .Services}}
 {{range .Methods}}
+{{$serviceMethod := printf "%s::%s" $svc.Name .Name -}}
+{{$methodName := index $exposedMethods $serviceMethod -}}
+{{if $methodName -}}
 {{$privateName := lower .Name -}}
 {{$genCodePkg := .GenCodePkgName -}}
 {{$func := printf "%s%sFunc" $svc.Name .Name -}}
@@ -1389,13 +1427,15 @@ func (h *{{$handler}}) Handle(
 		if err != nil {
 			return false, nil, nil, err
 		}
+		{{if .ResponseType -}}
 		res.Success = r
+		{{end -}}
 	{{else -}}
 		if err != nil {
 			switch v := err.(type) {
 			{{$method := .Name -}}
 			{{range .Exceptions -}}
-				case *{{$genCodePkg}}.{{title .Name}}:
+				case *{{.Type}}:
 					if v == nil {
 						return false, nil, nil, errors.New(
 							"Handler for {{$method}} returned non-nil error type *{{title .Name}} but nil value",
@@ -1406,7 +1446,7 @@ func (h *{{$handler}}) Handle(
 				default:
 					return false, nil, nil, err
 			}
-		} {{if ne .ResponseType "" -}} else {
+		} {{if .ResponseType -}} else {
 			res.Success = r
 		} {{end -}}
 	{{end}}
@@ -1414,7 +1454,7 @@ func (h *{{$handler}}) Handle(
 	return err == nil, &res, respHeaders, nil
 }
 {{end -}}
-
+{{end -}}
 {{end}}
 `)
 
@@ -1428,7 +1468,7 @@ func tchannel_client_test_serverTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "tchannel_client_test_server.tmpl", size: 2802, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
+	info := bindataFileInfo{name: "tchannel_client_test_server.tmpl", size: 2996, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

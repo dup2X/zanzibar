@@ -654,8 +654,8 @@ func (c *TypeConverter) GenStructConverter(
 // FieldMapperEntry defines a source field and optional arguments
 // converting and overriding fields.
 type FieldMapperEntry struct {
-	QualifiedName string
-	Field         *compile.FieldSpec
+	QualifiedName string             // Qualified Name for the key/source field.
+	Field         *compile.FieldSpec // FieldSpec for the destination field.
 
 	Override      bool
 	typeConverter string // TODO: implement. i.e string(int) etc

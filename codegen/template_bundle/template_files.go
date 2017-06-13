@@ -122,9 +122,12 @@ func (handler *{{$handlerName}}) HandleRequest(
 
 	{{if ne .RequestType ""}}
 	var requestBody {{unref .RequestType}}
+
+	{{- if ne .HTTPMethod "GET"}}
 	if ok := req.ReadAndUnmarshalBody(&requestBody); !ok {
 		return
 	}
+	{{end}}
 	{{end}}
 
 	{{range $headerName, $headerInfo := .ReqHeaderFields}}
@@ -135,6 +138,10 @@ func (handler *{{$handlerName}}) HandleRequest(
 	{{else}}
 	requestBody{{$headerInfo.FieldIdentifier}} = {{camel $headerName}}Value
 	{{end}}
+	{{end}}
+
+	{{range $index, $line := .QueryParamGoStatements -}}
+	{{$line}}
 	{{end}}
 
 	workflow := {{$workflow}}{
@@ -372,7 +379,7 @@ func endpointTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "endpoint.tmpl", size: 8520, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
+	info := bindataFileInfo{name: "endpoint.tmpl", size: 8636, mode: os.FileMode(420), modTime: time.Unix(1, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
